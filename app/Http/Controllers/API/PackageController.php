@@ -3,83 +3,47 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Package;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function index() {
+        return response()->json(Package::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+    public function store(Request $request) {
+        $request->validate([
+            'name' => 'required|string',
+            'destination_id' => 'required|exists:destinations,id',
+            'description' => 'nullable|string',
+            'price' => 'required|numeric',
+            'duration' => 'required|string',
+            'image' => 'nullable|string'
+        ]);
+
+        $package = Package::create($request->all());
+        return response()->json($package, 201);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+    public function show($id) {
+        $package = Package::find($id);
+        return $package ? response()->json($package, 200) : response()->json(['message' => 'Package not found'], 404);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
+    public function update(Request $request, $id) {
+        $package = Package::find($id);
+        if (!$package) return response()->json(['message' => 'Package not found'], 404);
+
+        $package->update($request->all());
+        return response()->json($package, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+    public function destroy($id) {
+        $package = Package::find($id);
+        if (!$package) return response()->json(['message' => 'Package not found'], 404);
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $package->delete();
+        return response()->json(['message' => 'Package delete'], 200);
     }
 }
