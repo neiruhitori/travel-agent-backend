@@ -13,4 +13,8 @@ class Destination extends Model
     protected $fillable = [
         'name', 'location', 'description', 'price', 'image'
     ];
+
+    public function packages(): HasMany {
+        return $this->hasMany(Package::class);
+    }
 }

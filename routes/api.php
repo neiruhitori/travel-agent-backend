@@ -6,6 +6,7 @@ use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,6 +20,7 @@ Route::apiResource('users', UserController::class);
 // Endpoint untuk Paket Tujuan
 Route::apiResource('destinations', DestinationController::class);
 
+
 // Endpoint untuk Paket Perjalanan
 Route::apiResource('packages', PackageController::class);
 
@@ -30,3 +32,7 @@ Route::apiResource('payments', PaymentController::class);
 
 // Endpoint untuk Pembayaran
 Route::apiResource('reviews', ReviewController::class);
+
+// Endpoint untuk Transaksi
+Route::apiResource('transactions', TransactionController::class);
+
