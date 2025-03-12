@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\API\UserController;
@@ -16,3 +17,6 @@ Route::apiResource('destinations', DestinationController::class);
 
 // Endpoint untuk Paket Perjalanan
 Route::apiResource('packages', PackageController::class);
+
+// Endpoint untuk Booking
+Route::apiResource('bookings', BookingController::class);
