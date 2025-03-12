@@ -15,6 +15,7 @@ class TransactionController extends Controller
     public function store(Request $request) {
         $request->validate([
             'user_id' => 'required|exists:users,id',
+            'payment_id' => 'required|exists:payments,id',
             'transaction_date' => 'required|date',
             'status' => 'required|string|in:pending,success,failed'
         ]);

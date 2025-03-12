@@ -23,7 +23,7 @@ class Booking extends Model
         return $this->belongsTo(Package::class);
     }
 
-    // public function payment(): HasOne {
-    //     return $this->hasOne(Payment::class);
-    // }
+    public function payment(): HasOne {
+        return $this->hasOne(Payment::class);
+    }
 }

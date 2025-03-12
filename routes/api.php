@@ -20,7 +20,6 @@ Route::apiResource('users', UserController::class);
 // Endpoint untuk Paket Tujuan
 Route::apiResource('destinations', DestinationController::class);
 
-
 // Endpoint untuk Paket Perjalanan
 Route::apiResource('packages', PackageController::class);
 

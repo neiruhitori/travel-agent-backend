@@ -23,8 +23,7 @@ class Payment extends Model
         return $this->belongsTo(User::class);
     }
 
-    // public function transaction(): HasOne {
-    //     return $this->hasOne(Transaction::class);
-    // }
-
+    public function transaction(): HasOne {
+        return $this->hasOne(Transaction::class);
+    }
 }
