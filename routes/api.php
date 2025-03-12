@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,3 +27,6 @@ Route::apiResource('bookings', BookingController::class);
 
 // Endpoint untuk Pembayaran
 Route::apiResource('payments', PaymentController::class);
+
+// Endpoint untuk Pembayaran
+Route::apiResource('reviews', ReviewController::class);
