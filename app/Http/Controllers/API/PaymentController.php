@@ -15,6 +15,7 @@ class PaymentController extends Controller
     public function store(Request $request) {
         $request->validate([
             'booking_id' => 'required|exists:bookings,id',
+            'user_id' => 'required|integer|exists:users,id',
             'payment_method' => 'required|string',
             'amount' => 'required|numeric',
             'status' => 'required|string|in:pending,completed,failed',
