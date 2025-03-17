@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
@@ -14,24 +15,29 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // })->middleware('auth:sanctum');
 
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
+Route::get('/who', [AuthController::class, 'who'])->middleware(['auth:sanctum']);
+
 // Endpoint untuk Paket User
-Route::apiResource('users', UserController::class);
+Route::apiResource('users', UserController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Paket Tujuan
-Route::apiResource('destinations', DestinationController::class);
+Route::apiResource('destinations', DestinationController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Paket Perjalanan
-Route::apiResource('packages', PackageController::class);
+Route::apiResource('packages', PackageController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Paket Booking
-Route::apiResource('bookings', BookingController::class);
+Route::apiResource('bookings', BookingController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Pembayaran
-Route::apiResource('payments', PaymentController::class);
+Route::apiResource('payments', PaymentController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Pembayaran
-Route::apiResource('reviews', ReviewController::class);
+Route::apiResource('reviews', ReviewController::class)->middleware(['auth:sanctum']);
 
 // Endpoint untuk Transaksi
-Route::apiResource('transactions', TransactionController::class);
+Route::apiResource('transactions', TransactionController::class)->middleware(['auth:sanctum']);
 
