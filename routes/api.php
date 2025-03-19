@@ -21,26 +21,32 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
 Route::get('/who', [AuthController::class, 'who'])->middleware(['auth:sanctum']);
 
-// Endpoint untuk Paket User
-Route::apiResource('users', UserController::class)->middleware(['auth:sanctum']);
+Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('destinations', DestinationController::class);
+    Route::apiResource('packages', PackageController::class);
+    Route::apiResource('vehicles', VehicleController::class);
+    Route::apiResource('bookings', BookingController::class);
+    Route::apiResource('payments', PaymentController::class);
+    Route::apiResource('reviews', ReviewController::class);
+    Route::apiResource('transactions', TransactionController::class);
+});
 
-// Endpoint untuk Paket Tujuan
-Route::apiResource('destinations', DestinationController::class)->middleware(['auth:sanctum']);
+Route::middleware(['auth:sanctum'])->group(function () {
+    // Route::get('bookings', [BookingController::class, 'index']);
+    Route::get('bookings/{booking}', [BookingController::class, 'show']);
+    Route::post('bookings', [BookingController::class, 'store']);
+    Route::put('bookings/{booking}', [BookingController::class, 'update']);
+    Route::delete('bookings/{booking}', [BookingController::class, 'destroy']);
 
-// Endpoint untuk Paket Perjalanan
-Route::apiResource('packages', PackageController::class)->middleware(['auth:sanctum']);
+    // Route::get('payments', [PaymentController::class, 'index']);
+    Route::get('payments/{payment}', [PaymentController::class, 'show']);
+    Route::post('payments', [PaymentController::class, 'store']);
 
-// Endpoint untuk Paket Booking
-Route::apiResource('bookings', BookingController::class)->middleware(['auth:sanctum']);
+    // Route::get('reviews', [ReviewController::class, 'index']);
+    Route::get('reviews/{review}', [ReviewController::class, 'show']);
+    Route::post('reviews', [ReviewController::class, 'store']); // Customer boleh buat review
 
-// Endpoint untuk Pembayaran
-Route::apiResource('payments', PaymentController::class)->middleware(['auth:sanctum']);
-
-// Endpoint untuk Pembayaran
-Route::apiResource('reviews', ReviewController::class)->middleware(['auth:sanctum']);
-
-// Endpoint untuk Transaksi
-Route::apiResource('transactions', TransactionController::class)->middleware(['auth:sanctum']);
-
-// Endpoint untuk Kendaraan
-Route::apiResource('vehicles', VehicleController::class)->middleware(['auth:sanctum']);
+    // Route::get('transactions', [TransactionController::class, 'index']);
+    Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+});

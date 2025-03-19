@@ -19,7 +19,7 @@ class VehicleController extends Controller
     {
         $request->validate([
             'name' => 'required|string',
-            'type' => 'required|string|in:' . implode(',', Vehicle::TYPES),
+            'type' => 'required|string',
             'capacity' => 'required|integer|min:1',
             'license_plate' => 'required|string|max:20|unique:vehicles',
             'status' => 'required|string|in:' . implode(',', Vehicle::STATUSES),
@@ -49,7 +49,7 @@ class VehicleController extends Controller
 
         $request->validate([
             'name' => 'required|string',
-            'type' => 'required|string|in:' . implode(',', Vehicle::TYPES),
+            'type' => 'required|string',
             'capacity' => 'required|integer|min:1',
             'license_plate' => 'required|string|max:20|unique:vehicles,license_plate,' . $id,
             'status' => 'required|string|in:' . implode(',', Vehicle::STATUSES),
