@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\PaymentController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
+use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -41,3 +42,5 @@ Route::apiResource('reviews', ReviewController::class)->middleware(['auth:sanctu
 // Endpoint untuk Transaksi
 Route::apiResource('transactions', TransactionController::class)->middleware(['auth:sanctum']);
 
+// Endpoint untuk Kendaraan
+Route::apiResource('vehicles', VehicleController::class)->middleware(['auth:sanctum']);
