@@ -12,10 +12,6 @@ use App\Http\Controllers\API\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->middleware(['auth:sanctum']);
@@ -50,3 +46,27 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Route::get('transactions', [TransactionController::class, 'index']);
     Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
 });
+
+// // Endpoint untuk User
+// Route::apiResource('users', UserController::class);
+
+// // Endpoint untuk Tujuan
+// Route::apiResource('destinations', DestinationController::class);
+
+// // Endpoint untuk Paket Perjalanan
+// Route::apiResource('packages', PackageController::class);
+
+// // Endpoint untuk Booking
+// Route::apiResource('bookings', BookingController::class);
+
+// // Endpoint untuk Pembayaran
+// Route::apiResource('payments', PaymentController::class);
+
+// // Endpoint untuk Ulasan
+// Route::apiResource('reviews', ReviewController::class);
+
+// // Endpoint untuk Transaksi
+// Route::apiResource('transactions', TransactionController::class);
+
+// // Endpoint untuk Travel
+// Route::apiResource('vehicles', VehicleController::class);
