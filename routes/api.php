@@ -35,6 +35,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Update profile
+    Route::put('users/{user}', [UserController::class, 'update']);
     
     // Customer bookings endpoints
     Route::get('bookings/{booking}', [BookingController::class, 'show']);
