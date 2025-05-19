@@ -62,3 +62,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Customer transactions endpoints
     Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
 });
+
+// buat landing page
+   Route::apiResource('packages', PackageController::class);
+    Route::apiResource('bookings', BookingController::class);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('vehicles', VehicleController::class);

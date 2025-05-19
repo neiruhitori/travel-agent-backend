@@ -11,7 +11,7 @@ class PackageController extends Controller
 {
     public function index()
     {
-        $packages = Package::with('destination:id,location')
+        $packages = Package::with('destination:id,location,name')
             ->where('status', 'active')
             ->get();
 
