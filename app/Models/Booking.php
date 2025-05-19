@@ -12,7 +12,7 @@ class Booking extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'package_id', 'vehicle_id', 'booking_date', 'total_price', 'status'
+        'user_id', 'package_id', 'vehicle_id', 'booking_date', 'jumlah_penumpang', 'total_price', 'status'
     ];
 
     public function user(): BelongsTo {

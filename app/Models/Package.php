@@ -12,8 +12,13 @@ class Package extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'destination_id', 'description', 'price', 'duration', 'image'
+        'name', 'destination_id','passenger_count', 'description', 'price', 'duration', 'image', 'status'
     ];
+
+    public function isActive()
+    {
+        return $this->status === 'active';
+    }
 
     public function destination(): BelongsTo {
         return $this->belongsTo(Destination::class);

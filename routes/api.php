@@ -36,14 +36,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
         return $request->user();
     });
 
+    Route::apiResource('packages', PackageController::class);
+    Route::apiResource('bookings', BookingController::class);
+    Route::apiResource('users', UserController::class);
+    Route::apiResource('vehicles', VehicleController::class);
+
+
     // Update profile
     Route::put('users/{user}', [UserController::class, 'update']);
-    
+
     // Customer bookings endpoints
-    Route::get('bookings/{booking}', [BookingController::class, 'show']);
-    Route::post('bookings', [BookingController::class, 'store']);
-    Route::put('bookings/{booking}', [BookingController::class, 'update']);
-    Route::delete('bookings/{booking}', [BookingController::class, 'destroy']);
+    // Route::get('bookings/{booking}', [BookingController::class, 'show']);
+    // Route::post('bookings', [BookingController::class, 'store']);
+    // Route::put('bookings/{booking}', [BookingController::class, 'update']);
+    // Route::delete('bookings/{booking}', [BookingController::class, 'destroy']);
 
     // Customer payments endpoints
     Route::get('payments/{payment}', [PaymentController::class, 'show']);

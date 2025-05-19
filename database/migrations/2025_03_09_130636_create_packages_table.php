@@ -21,6 +21,7 @@ class CreatePackagesTable extends Migration
             $table->decimal('price', 10, 2);
             $table->string('duration');
             $table->string('image')->nullable();
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->timestamps();
         });
     }
