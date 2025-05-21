@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\VehicleController;
+use App\Http\Controllers\API\PengajuanController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('transactions', TransactionController::class);
+
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -45,6 +47,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Route::get('transactions', [TransactionController::class, 'index']);
     Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+
+     // Customer pengajuan endpoints
+     Route::get('pengajuan/{pengajuan}', [PengajuanController::class, 'show']);
+     Route::put('pengajuan/{pengajuan}', [PengajuanController::class, 'update']);
+     Route::delete('pengajuan/{pengajuan}', [PengajuanController::class, 'destroy']);
+     Route::post('pengajuan', [PengajuanController::class, 'store']);
 });
 
 // // Endpoint untuk User
