@@ -60,10 +60,22 @@ class BookingController extends Controller
     public function update(Request $request, $id)
     {
         $booking = Booking::find($id);
-        if (!$booking) return response()->json(['message' => 'Booking not found'], 404);
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'package_id' => 'required|exists:packages,id',
+            'vehicle_id' => 'required|exists:vehicles,id',
+            'booking_date' => 'required|date',
+            'jumlah_penumpang' => 'required|numeric|min:1',
+            'total_price' => 'required|numeric|min:0',
+            'status' => 'required|in:pending,cancelled,confirmed,completed',
+        ]);
 
         $booking->update($request->all());
-        return response()->json($booking, 200);
+        return response()->json(['message' => 'Booking updated successfully', 'data' => $booking], 200);
     }
 
     public function destroy($id)

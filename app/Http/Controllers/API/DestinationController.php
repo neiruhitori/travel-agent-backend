@@ -13,7 +13,14 @@ class DestinationController extends Controller
 {
     public function index()
     {
-        $destinations = Destination::all();
+        $destinations = Destination::all()->map(function ($destination) {
+            // Tambahkan image_url untuk setiap destinasi
+            $destination->image_url = $destination->image 
+                ? asset('storage/' . $destination->image) 
+                : null;
+            return $destination;
+        });
+        
         return response()->json([
             'destinations' => $destinations
         ], 200);
