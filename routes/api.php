@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BookingController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\API\PengajuanController;
 use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
@@ -35,6 +36,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Customer pengajuan endpoints
+    Route::get('pengajuan/{pengajuan}', [PengajuanController::class, 'show']);
+    Route::put('pengajuan/{pengajuan}', [PengajuanController::class, 'update']);
+    Route::delete('pengajuan/{pengajuan}', [PengajuanController::class, 'destroy']);
+    Route::post('pengajuan', [PengajuanController::class, 'store']);
 
     Route::apiResource('packages', PackageController::class);
     Route::apiResource('bookings', BookingController::class);
