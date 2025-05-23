@@ -26,8 +26,6 @@ class PackageController extends Controller
         $request->validate([
             'name' => 'required|string',
             'destination_id' => 'required|exists:destinations,id',
-            'asal' => 'nullable|string',
-            'keberangkatan_date' => 'required|date',
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'duration' => 'required|string',
