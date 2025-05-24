@@ -17,10 +17,15 @@ class PengajuanController extends Controller
     {
         $user = Auth::user();
         if ($user && $user->role === 'customer') {
-            $pengajuan = Pengajuan::where('user_id', $user->id)->get();
+            $pengajuan = Pengajuan::where('user_id', $user->id)->with('destination')->get();
         } else {
-            $pengajuan = Pengajuan::all();
+            $pengajuan = Pengajuan::with('destination')->get();
         }
+        $pengajuan = $pengajuan->map(function ($item) {
+            $itemArray = $item->toArray();
+            $itemArray['destination'] = $item->destination ? $item->destination->location : null;
+            return $itemArray;
+        });
         return response()->json($pengajuan, 200);
     }
 
@@ -43,6 +48,7 @@ class PengajuanController extends Controller
             'return_date' => 'required|date|after_or_equal:departure_date',
             'participants' => 'required|integer|min:1',
             'notes' => 'nullable|string',
+            'status' => 'sometimes|in:menunggu_konfirmasi,menunggu_persetujuan,disetujui,dalam_perjalanan,menunggu_pembayaran,lunas,ditolak',
         ]);
 
         $pengajuan = Pengajuan::create([
@@ -56,6 +62,7 @@ class PengajuanController extends Controller
             'return_date' => $request->return_date,
             'participants' => $request->participants,
             'notes' => $request->notes,
+            'status' => $request->status ?? 'menunggu_konfirmasi',
         ]);
 
         return response()->json(['message' => 'Pengajuan berhasil disimpan', 'pengajuan' => $pengajuan], 201);
@@ -64,14 +71,16 @@ class PengajuanController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        $pengajuan = Pengajuan::find($id);
+        $pengajuan = Pengajuan::with('destination')->find($id);
         if (!$pengajuan) {
             return response()->json(['message' => 'Pengajuan not found'], 404);
         }
         if ($user && $user->role === 'customer' && $pengajuan->user_id !== $user->id) {
             return response()->json(['message' => 'Akses ditolak'], 403);
         }
-        return response()->json($pengajuan, 200);
+        $pengajuanArray = $pengajuan->toArray();
+        $pengajuanArray['destination'] = $pengajuan->destination ? $pengajuan->destination->location : null;
+        return response()->json($pengajuanArray, 200);
     }
 
     public function edit(string $id)
@@ -99,6 +108,7 @@ class PengajuanController extends Controller
             'return_date' => 'sometimes|required|date|after_or_equal:departure_date',
             'participants' => 'sometimes|required|integer|min:1',
             'notes' => 'nullable|string',
+            'status' => 'sometimes|in:menunggu_konfirmasi,menunggu_persetujuan,disetujui,dalam_perjalanan,menunggu_pembayaran,lunas,ditolak',
         ]);
         $pengajuan->update($request->all());
         return response()->json($pengajuan, 200);

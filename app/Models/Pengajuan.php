@@ -23,11 +23,12 @@ class Pengajuan extends Model
         'participants',
         'notes',
         'user_id',
+        'status',
     ];
 
     public function destination()
     {
-        return $this->belongsTo(Destination::class);
+        return $this->belongsTo(Destination::class, 'destination_id');
     }
 
     // public function vehicle()

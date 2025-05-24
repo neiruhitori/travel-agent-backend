@@ -23,6 +23,15 @@ return new class extends Migration
             $table->date('return_date');
             $table->unsignedInteger('participants');
             $table->text('notes')->nullable();
+            $table->enum('status', [
+                'menunggu_konfirmasi',
+                'menunggu_persetujuan',
+                'disetujui',
+                'dalam_perjalanan',
+                'menunggu_pembayaran',
+                'lunas',
+                'ditolak',
+            ])->default('menunggu_konfirmasi');
             $table->timestamps();
         });
     }
