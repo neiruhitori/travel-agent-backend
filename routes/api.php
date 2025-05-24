@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('pengajuan', PengajuanController::class);
 });
 
 // Authenticated user routes
@@ -47,6 +48,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('bookings', BookingController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('vehicles', VehicleController::class);
+    // Route::apiResource('pengajuan', PengajuanController::class);
+    Route::apiResource('destinations', DestinationController::class);
 
 
     // Update profile
