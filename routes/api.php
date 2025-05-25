@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\BookingDestController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
 use App\Http\Controllers\Api\PaymentController;
@@ -26,6 +27,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('packages', PackageController::class);
     Route::apiResource('vehicles', VehicleController::class);
     Route::apiResource('bookings', BookingController::class);
+    Route::apiResource('bookingdes', BookingDestController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('transactions', TransactionController::class);
@@ -44,22 +46,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('pengajuan/{pengajuan}', [PengajuanController::class, 'destroy']);
     Route::post('pengajuan', [PengajuanController::class, 'store']);
 
+    Route::apiResource('bookingdes', BookingDestController::class);
+
     Route::apiResource('packages', PackageController::class);
     Route::apiResource('bookings', BookingController::class);
     Route::apiResource('users', UserController::class);
     Route::apiResource('vehicles', VehicleController::class);
-    // Route::apiResource('pengajuan', PengajuanController::class);
     Route::apiResource('destinations', DestinationController::class);
-
 
     // Update profile
     Route::put('users/{user}', [UserController::class, 'update']);
-
-    // Customer bookings endpoints
-    // Route::get('bookings/{booking}', [BookingController::class, 'show']);
-    // Route::post('bookings', [BookingController::class, 'store']);
-    // Route::put('bookings/{booking}', [BookingController::class, 'update']);
-    // Route::delete('bookings/{booking}', [BookingController::class, 'destroy']);
 
     // Customer payments endpoints
     Route::get('payments/{payment}', [PaymentController::class, 'show']);
@@ -74,7 +70,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 });
 
 // buat landing page
-   Route::apiResource('packages', PackageController::class);
-    Route::apiResource('bookings', BookingController::class);
-    Route::apiResource('users', UserController::class);
-    Route::apiResource('vehicles', VehicleController::class);
+Route::apiResource('packages', PackageController::class);
+Route::apiResource('bookings', BookingController::class);
+Route::apiResource('users', UserController::class);
+Route::apiResource('vehicles', VehicleController::class);
+Route::apiResource('destinations', DestinationController::class);
+Route::apiResource('pengajuan', PengajuanController::class);
