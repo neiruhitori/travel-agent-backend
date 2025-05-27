@@ -14,7 +14,6 @@ class PackageController extends Controller
     public function index()
     {
         $packages = Package::with('destination:id,location,name,image')
-            ->where('status', 'active')
             ->get();
 
         return response()->json([
@@ -30,7 +29,7 @@ class PackageController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'duration' => 'required|string',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
+            'image' => 'required|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
         try {
@@ -43,10 +42,15 @@ class PackageController extends Controller
             }
 
             $package = Package::create($data);
-            return response()->json($package, 201);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Package berhasil dibuat',
+                'data' => $package
+            ], 201);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "Something went wrong!"
+                'status' => 'error',
+                'message' => 'Gagal membuat package'
             ], 500);
         }
     }
@@ -79,21 +83,44 @@ class PackageController extends Controller
             }
 
             $package->update($data);
-            return response()->json($package, 200);
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Package berhasil diupdate',
+                'data' => $package
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => "Something went wrong!"
+                'status' => 'error',
+                'message' => 'Gagal mengupdate package'
             ], 500);
         }
     }
 
     public function destroy($id)
     {
-        $package = Package::find($id);
-        if (!$package) return response()->json(['message' => 'Package not found'], 404);
+        try {
+            $package = Package::find($id);
+            if (!$package) return response()->json(['message' => 'Package not found'], 404);
 
-        $package->delete();
-        return response()->json(['message' => 'Package delete'], 200);
+            // Delete image from storage if exists
+            if ($package->image) {
+                $storage = Storage::disk('public');
+                if ($storage->exists($package->image)) {
+                    $storage->delete($package->image);
+                }
+            }
+
+            $package->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Package berhasil dihapus'
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal menghapus package'
+            ], 500);
+        }
     }
 
     // public function search(Request $request)
