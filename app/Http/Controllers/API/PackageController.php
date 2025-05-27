@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Destination;
 use App\Models\Package;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class PackageController extends Controller
 {
@@ -20,7 +22,6 @@ class PackageController extends Controller
         ]);
     }
 
-
     public function store(Request $request)
     {
         $request->validate([
@@ -29,11 +30,25 @@ class PackageController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric',
             'duration' => 'required|string',
-            'image' => 'nullable|string'
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,gif|max:2048'
         ]);
 
-        $package = Package::create($request->all());
-        return response()->json($package, 201);
+        try {
+            $data = $request->all();
+
+            if ($request->hasFile('image')) {
+                $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
+                Storage::disk('public')->put($imageName, file_get_contents($request->image));
+                $data['image'] = $imageName;
+            }
+
+            $package = Package::create($data);
+            return response()->json($package, 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => "Something went wrong!"
+            ], 500);
+        }
     }
 
     public function show($id)
@@ -47,8 +62,29 @@ class PackageController extends Controller
         $package = Package::find($id);
         if (!$package) return response()->json(['message' => 'Package not found'], 404);
 
-        $package->update($request->all());
-        return response()->json($package, 200);
+        try {
+            $data = $request->all();
+
+            if ($request->hasFile('image')) {
+                // Delete old image
+                $storage = Storage::disk('public');
+                if ($storage->exists($package->image)) {
+                    $storage->delete($package->image);
+                }
+
+                // Store new image
+                $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
+                $storage->put($imageName, file_get_contents($request->image));
+                $data['image'] = $imageName;
+            }
+
+            $package->update($data);
+            return response()->json($package, 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => "Something went wrong!"
+            ], 500);
+        }
     }
 
     public function destroy($id)
