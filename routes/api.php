@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\VehicleController;
+use App\Http\Controllers\API\InvoiceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -76,3 +77,5 @@ Route::apiResource('users', UserController::class);
 Route::apiResource('vehicles', VehicleController::class);
 Route::apiResource('destinations', DestinationController::class);
 Route::apiResource('pengajuan', PengajuanController::class);
+
+Route::apiResource('invoices', InvoiceController::class);
