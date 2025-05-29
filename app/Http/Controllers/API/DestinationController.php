@@ -15,12 +15,12 @@ class DestinationController extends Controller
     {
         $destinations = Destination::all()->map(function ($destination) {
             // Tambahkan image_url untuk setiap destinasi
-            $destination->image_url = $destination->image 
-                ? asset('storage/' . $destination->image) 
+            $destination->image_url = $destination->image
+                ? asset('storage/' . $destination->image)
                 : null;
             return $destination;
         });
-        
+
         return response()->json([
             'destinations' => $destinations
         ], 200);
@@ -84,18 +84,16 @@ class DestinationController extends Controller
             $destination->price = $request->price;
 
             if ($request->image) {
-                // ini public storage
                 $storage = Storage::disk('public');
 
-                // mengahpus image sebelumnya
+                // Hapus gambar sebelumnya jika ada
                 if ($storage->exists($destination->image))
-                $storage->delete($destination->image);
+                    $storage->delete($destination->image);
 
-                // buat image name
                 $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
                 $destination->image = $imageName;
 
-                // menyimpan imgage di folder
+                // Simpan gambar di folder
                 $storage->put($imageName, file_get_contents($request->image));
             }
 
@@ -104,7 +102,6 @@ class DestinationController extends Controller
             return response()->json([
                 'message' => "Destination successfully update."
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'message' => "Something went really wrong!"
@@ -114,10 +111,27 @@ class DestinationController extends Controller
 
     public function destroy($id)
     {
-        $destination = Destination::find($id);
-        if (!$destination) return response()->json(['message' => 'Destination tidak ditemukan'], 404);
+        try {
+            $destination = Destination::find($id);
+            if (!$destination) return response()->json(['message' => 'Destination not found'], 404);
 
-        $destination->delete();
-        return response()->json(['message' => 'Destination berhasil dihapus'], 200);
+            if ($destination->image) {
+                $storage = Storage::disk('public');
+                if ($storage->exists($destination->image)) {
+                    $storage->delete($destination->image);
+                }
+            }
+
+            $destination->delete();
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Destination successfully delete.'
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to delete destination!'
+            ], 500);
+        }
     }
 }
