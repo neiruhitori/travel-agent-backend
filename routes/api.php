@@ -79,3 +79,5 @@ Route::apiResource('destinations', DestinationController::class);
 Route::apiResource('pengajuan', PengajuanController::class);
 
 Route::apiResource('invoices', InvoiceController::class);
+
+Route::get('invoice/by-pengajuan/{pengajuan_id}', [InvoiceController::class, 'byPengajuan']);

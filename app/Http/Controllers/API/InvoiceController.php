@@ -78,4 +78,14 @@ class InvoiceController extends Controller
         $invoice->delete();
         return response()->json(['message' => 'Invoice berhasil dihapus'], 200);
     }
+
+    // Ambil invoice berdasarkan pengajuan_id
+    public function byPengajuan($pengajuan_id)
+    {
+        $invoice = Invoice::with(['pengajuan', 'user'])->where('pengajuan_id', $pengajuan_id)->first();
+        if (!$invoice) {
+            return response()->json(['message' => 'Invoice not found'], 404);
+        }
+        return response()->json($invoice, 200);
+    }
 }
