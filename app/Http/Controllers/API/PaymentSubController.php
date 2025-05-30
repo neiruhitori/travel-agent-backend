@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Paymentsub;
 use App\Models\Pengajuan;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 class PaymentSubController extends Controller
 {
@@ -79,5 +80,47 @@ class PaymentSubController extends Controller
         }
         $paymentsub->delete();
         return response()->json(['message' => 'PaymentSub berhasil dihapus'], 200);
+    }
+
+    // Generate barcode untuk pengajuan tertentu
+    public function generateBarcode(Request $request)
+    {
+        $request->validate([
+            'pengajuan_id' => 'required|exists:pengajuan,id',
+            'value' => 'required|string', // nilai yang ingin di-encode
+        ]);
+
+        $barcodeValue = $request->value;
+
+        // Generate QR code sebagai base64 PNG
+        $qrImage = QrCode::format('png')->size(300)->generate($barcodeValue);
+        $base64 = base64_encode($qrImage);
+
+        // Simpan base64 ke database, atau simpan file ke storage dan simpan path-nya
+        // Contoh: simpan base64 ke kolom barcode di Paymentsub
+        $paymentsub = Paymentsub::firstOrCreate(
+            ['pengajuan_id' => $request->pengajuan_id],
+            ['barcode' => $base64]
+        );
+        if (!$paymentsub->wasRecentlyCreated) {
+            $paymentsub->barcode = $base64;
+            $paymentsub->save();
+        }
+
+        return response()->json([
+            'message' => 'Barcode generated',
+            'barcode_base64' => $base64,
+            'paymentsub' => $paymentsub
+        ], 200);
+    }
+
+    // Get barcode by pengajuan_id
+    public function getBarcodeByPengajuan($pengajuan_id)
+    {
+        $paymentsub = Paymentsub::where('pengajuan_id', $pengajuan_id)->first();
+        if (!$paymentsub || !$paymentsub->barcode) {
+            return response()->json(['message' => 'Barcode not found'], 404);
+        }
+        return response()->json(['barcode' => $paymentsub->barcode], 200);
     }
 }

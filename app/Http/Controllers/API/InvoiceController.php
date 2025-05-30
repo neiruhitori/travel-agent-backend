@@ -86,6 +86,9 @@ class InvoiceController extends Controller
         if (!$invoice) {
             return response()->json(['message' => 'Invoice not found'], 404);
         }
-        return response()->json($invoice, 200);
+        // Tambahkan alias total_harga agar frontend tidak bingung
+        $data = $invoice->toArray();
+        $data['total_harga'] = $invoice->total;
+        return response()->json($data, 200);
     }
 }
