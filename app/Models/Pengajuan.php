@@ -50,4 +50,20 @@ class Pengajuan extends Model
     {
         return $this->destination ? $this->destination->location : null;
     }
+
+    // Status enum sesuai migration
+    public const STATUS_ENUM = [
+        'menunggu_konfirmasi',
+        'menunggu_persetujuan',
+        'disetujui',
+        'dalam_perjalanan',
+        'menunggu_pembayaran',
+        'lunas',
+        'ditolak',
+    ];
+
+    public static function getStatusEnum()
+    {
+        return self::STATUS_ENUM;
+    }
 }
