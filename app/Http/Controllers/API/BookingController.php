@@ -53,10 +53,14 @@ class BookingController extends Controller
 
     public function show($id)
     {
-        $booking = Booking::with(['user', 'package', 'vehicle'])->find($id);
-        return $booking 
-            ? response()->json(['data' => $booking], 200) 
-            : response()->json(['message' => 'Booking tidak ditemukan'], 404);
+        $booking = Booking::with(['user', 'package', 'vehicle', 'payment.transaction'])
+            ->find($id);
+
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        return response()->json(['data' => $booking], 200);
     }
 
     public function update(Request $request, $id)

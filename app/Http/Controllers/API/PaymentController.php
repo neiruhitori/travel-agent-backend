@@ -9,7 +9,8 @@ use Illuminate\Http\Request;
 class PaymentController extends Controller
 {
     public function index() {
-        return response()->json(Payment::all(), 200);
+        $payments = Payment::with('booking.package')->get();
+        return response()->json($payments, 200);
     }
 
     public function store(Request $request) {
@@ -19,15 +20,23 @@ class PaymentController extends Controller
             'payment_method' => 'required|string',
             'amount' => 'required|numeric',
             'status' => 'required|string|in:pending,completed,failed',
-            'payment_date' => 'required|date'
+            'payment_date' => 'required|date',
+            'bukti_pembayaran' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $payment = Payment::create($request->all());
+        $data = $request->all();
+        if ($request->hasFile('bukti_pembayaran')) {
+            $file = $request->file('bukti_pembayaran');
+            $path = $file->store('bukti_pembayaran', 'public');
+            $data['bukti_pembayaran'] = $path;
+        }
+
+        $payment = Payment::create($data);
         return response()->json($payment, 201);
     }
 
     public function show($id) {
-        $payment = Payment::find($id);
+        $payment = Payment::with('booking.user', 'booking.package', 'booking.vehicle', 'transaction')->find($id);
         return $payment ? response()->json($payment, 200) : response()->json(['message' => 'Payment not found'], 404);
     }
 
@@ -39,10 +48,18 @@ class PaymentController extends Controller
             'payment_method' => 'sometimes|string',
             'amount' => 'sometimes|numeric',
             'status' => 'sometimes|string|in:pending,completed,failed',
-            'payment_date' => 'sometimes|date'
+            'payment_date' => 'sometimes|date',
+            'bukti_pembayaran' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $payment->update($request->all());
+        $data = $request->all();
+        if ($request->hasFile('bukti_pembayaran')) {
+            $file = $request->file('bukti_pembayaran');
+            $path = $file->store('bukti_pembayaran', 'public');
+            $data['bukti_pembayaran'] = $path;
+        }
+
+        $payment->update($data);
         return response()->json($payment, 200);
     }
 

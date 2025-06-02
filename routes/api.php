@@ -69,6 +69,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Customer transactions endpoints
     Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+
+    // New booking endpoint
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
 });
 
 // buat landing page

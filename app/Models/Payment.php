@@ -12,7 +12,7 @@ class Payment extends Model
     use HasFactory;
 
     protected $fillable = [
-        'booking_id', 'user_id', 'amount', 'payment_method', 'status', 'payment_date'
+        'booking_id', 'user_id', 'amount', 'payment_method', 'status', 'payment_date', 'bukti_pembayaran'
     ];
 
     public function booking(): BelongsTo {
