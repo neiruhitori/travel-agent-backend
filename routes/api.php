@@ -90,3 +90,6 @@ Route::get('invoice/by-pengajuan/{pengajuan_id}', [InvoiceController::class, 'by
 Route::post('paymentsub/generate-barcode', [PaymentSubController::class, 'generateBarcode']);
 // Route untuk mengambil barcode berdasarkan pengajuan_id
 Route::get('paymentsub/barcode/{pengajuan_id}', [PaymentSubController::class, 'getBarcodeByPengajuan']);
+
+Route::patch('pengajuan/{id}/status', [PengajuanController::class, 'updateStatus']);
+Route::apiResource('paymentsub', PaymentSubController::class);
