@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\BookingController;
-use App\Http\Controllers\Api\BookingDestController;
+// use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\BookingDestController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PengajuanController;
-use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\VehicleController;
@@ -91,5 +91,6 @@ Route::post('paymentsub/generate-barcode', [PaymentSubController::class, 'genera
 // Route untuk mengambil barcode berdasarkan pengajuan_id
 Route::get('paymentsub/barcode/{pengajuan_id}', [PaymentSubController::class, 'getBarcodeByPengajuan']);
 
+// Route untuk update status pengajuan user
 Route::patch('pengajuan/{id}/status', [PengajuanController::class, 'updateStatus']);
 Route::apiResource('paymentsub', PaymentSubController::class);
