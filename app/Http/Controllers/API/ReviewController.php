@@ -8,11 +8,16 @@ use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    public function index() {
-        return response()->json(Review::all(), 200);
+    public function index()
+    {
+        return response()->json(
+            Review::with(['user:id,name', 'package:id,name'])->get(),
+            200
+        );
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'user_id' => 'required|exists:users,id',
             'package_id' => 'required|exists:packages,id',
@@ -24,12 +29,14 @@ class ReviewController extends Controller
         return response()->json($review, 201);
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $review = Review::find($id);
         return $review ? response()->json($review, 200) : response()->json(['message' => 'Review not found'], 404);
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $review = Review::find($id);
         if (!$review) return response()->json(['message' => 'Review not found'], 404);
 
@@ -42,12 +49,12 @@ class ReviewController extends Controller
         return response()->json($review, 200);
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $review = Review::find($id);
         if (!$review) return response()->json(['message' => 'Review not found'], 404);
 
         $review->delete();
         return response()->json(['message' => 'Review delete'], 200);
     }
-
 }
