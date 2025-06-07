@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api;
+namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Payment;
@@ -8,12 +8,14 @@ use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
-    public function index() {
+    public function index()
+    {
         $payments = Payment::with('booking.package')->get();
         return response()->json($payments, 200);
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $request->validate([
             'booking_id' => 'required|exists:bookings,id',
             'user_id' => 'required|integer|exists:users,id',
@@ -35,12 +37,14 @@ class PaymentController extends Controller
         return response()->json($payment, 201);
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         $payment = Payment::with('booking.user', 'booking.package', 'booking.vehicle', 'transaction')->find($id);
         return $payment ? response()->json($payment, 200) : response()->json(['message' => 'Payment not found'], 404);
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $payment = Payment::find($id);
         if (!$payment) return response()->json(['message' => 'Payment not found'], 404);
 
@@ -63,12 +67,12 @@ class PaymentController extends Controller
         return response()->json($payment, 200);
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $payment = Payment::find($id);
         if (!$payment) return response()->json(['message' => 'Payment not found'], 404);
 
         $payment->delete();
         return response()->json(['message' => 'Payment delete'], 200);
     }
-
 }
