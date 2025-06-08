@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('pengajuan', PengajuanController::class);
+    Route::apiResource('paymentsub', PaymentSubController::class);
 });
 
 // Authenticated user routes
@@ -83,6 +84,9 @@ Route::apiResource('destinations', DestinationController::class);
 Route::apiResource('pengajuan', PengajuanController::class);
 
 Route::apiResource('invoices', InvoiceController::class);
+// resend Email
+Route::post('invoices/{id}/resend', [InvoiceController::class, 'resendEmail']);
+Route::post('/pengajuan/{id}/resend-payment-received', [PengajuanController::class, 'resendPaymentReceived']);
 
 Route::get('invoice/by-pengajuan/{pengajuan_id}', [InvoiceController::class, 'byPengajuan']);
 
@@ -93,3 +97,5 @@ Route::get('paymentsub/barcode/{pengajuan_id}', [PaymentSubController::class, 'g
 
 Route::patch('pengajuan/{id}/status', [PengajuanController::class, 'updateStatus']);
 Route::apiResource('paymentsub', PaymentSubController::class);
+Route::get('notifications/paymentsub', [PaymentSubController::class, 'notifications']);
+

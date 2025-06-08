@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount', 10, 2);
             $table->enum('payment_method', ['transfer bank', 'credit card', 'e-wallet']);
             $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
+            $table->string('bukti_pembayaran')->nullable();
             $table->timestamp('payment_date')->nullable();
             $table->timestamps();
         });
