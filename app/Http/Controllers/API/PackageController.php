@@ -14,7 +14,19 @@ class PackageController extends Controller
     public function index()
     {
         $packages = Package::with('destination:id,location,name,image')
-            ->get();
+            ->get()
+            ->map(function ($package) {
+                $package->image_url = $package->image
+                    ? asset('storage/' . $package->image)
+                    : null;
+                // Tambahkan image_url untuk destination juga
+                if ($package->destination) {
+                    $package->destination->image_url = $package->destination->image
+                        ? asset('storage/' . $package->destination->image)
+                        : null;
+                }
+                return $package;
+            });
 
         return response()->json([
             'packages' => $packages
@@ -57,8 +69,19 @@ class PackageController extends Controller
 
     public function show($id)
     {
-        $package = Package::find($id);
-        return $package ? response()->json($package, 200) : response()->json(['message' => 'Package not found'], 404);
+        $package = Package::with('destination')->find($id);
+        if (!$package) {
+            return response()->json(['message' => 'Package not found'], 404);
+        }
+        $package->image_url = $package->image
+            ? asset('storage/' . $package->image)
+            : null;
+        if ($package->destination) {
+            $package->destination->image_url = $package->destination->image
+                ? asset('storage/' . $package->destination->image)
+                : null;
+        }
+        return response()->json($package, 200);
     }
 
     public function update(Request $request, $id)
@@ -70,19 +93,22 @@ class PackageController extends Controller
             $data = $request->all();
 
             if ($request->hasFile('image')) {
-                // Delete old image
                 $storage = Storage::disk('public');
                 if ($storage->exists($package->image)) {
                     $storage->delete($package->image);
                 }
-
-                // Store new image
                 $imageName = Str::random(32) . "." . $request->image->getClientOriginalExtension();
                 $storage->put($imageName, file_get_contents($request->image));
                 $data['image'] = $imageName;
             }
 
             $package->update($data);
+
+            // Tambahkan image_url di response update
+            $package->image_url = $package->image
+                ? asset('storage/' . $package->image)
+                : null;
+
             return response()->json([
                 'status' => 'success',
                 'message' => 'Package berhasil diupdate',

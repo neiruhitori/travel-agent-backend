@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Pengajuan;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
 use App\Models\Destination;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\Validator;
@@ -167,16 +169,51 @@ class PengajuanController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string|in:menunggu_konfirmasi,menunggu_persetujuan,disetujui,dalam_perjalanan,menunggu_pembayaran,menunggu_verifikasi_pembayaran,pembayaran_ditolak,lunas,ditolak'
+            'status' => 'required|string|in:menunggu_konfirmasi,menunggu_persetujuan,disetujui,dalam_perjalanan,menunggu_pembayaran,menunggu_verifikasi_pembayaran,pembayaran_ditolak,lunas,ditolak,invoice_terkirim'
         ]);
 
-        $pengajuan = Pengajuan::findOrFail($id);
+        $pengajuan = Pengajuan::with(['destination', 'paymentsub'])->findOrFail($id);
         $pengajuan->status = $request->status;
         $pengajuan->save();
+
+        // Kirim email invoice jika status invoice_terkirim
+        if ($pengajuan->status === 'invoice_terkirim' && $pengajuan->email) {
+            $invoice = \App\Models\Invoice::where('pengajuan_id', $pengajuan->id)->latest()->first();
+            if ($invoice) {
+                Mail::to($pengajuan->email)->send(new \App\Mail\InvoiceMail($invoice));
+            }
+        }
+
+        // Kirim email bukti pembayaran jika status lunas/pembayaran diterima
+        if ($pengajuan->status === 'lunas' && $pengajuan->email) {
+            $paymentsub = $pengajuan->paymentsub;
+            if ($paymentsub) {
+                Mail::to($pengajuan->email)->send(new \App\Mail\PaymentReceivedMail($pengajuan, $paymentsub));
+            }
+        }
 
         return response()->json([
             'message' => 'Status pengajuan berhasil diperbarui',
             'data' => $pengajuan
         ], 200);
+    }
+
+    public function resendPaymentReceived($id)
+    {
+        $pengajuan = Pengajuan::with(['destination', 'paymentsub'])->find($id);
+        if (!$pengajuan) {
+            return response()->json(['message' => 'Pengajuan not found'], 404);
+        }
+        if (!$pengajuan->email) {
+            return response()->json(['message' => 'Customer email not found'], 404);
+        }
+        $paymentsub = $pengajuan->paymentsub;
+        if (!$paymentsub) {
+            return response()->json(['message' => 'Data pembayaran tidak ditemukan'], 404);
+        }
+
+        Mail::to($pengajuan->email)->send(new \App\Mail\PaymentReceivedMail($pengajuan, $paymentsub));
+
+        return response()->json(['message' => 'Email pembayaran diterima berhasil dikirim ulang ke customer.']);
     }
 }

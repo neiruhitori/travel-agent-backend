@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\Pengajuan;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 
 class InvoiceController extends Controller
@@ -36,6 +37,11 @@ class InvoiceController extends Controller
             'total' => $request->total,
             'status' => 'sent', // default status
         ]);
+
+        // Kirim email ke customer setelah invoice dibuat
+        if ($pengajuan->email) {
+            Mail::to($pengajuan->email)->send(new \App\Mail\InvoiceMail($invoice));
+        }
 
         return response()->json([
             'message' => 'Invoice berhasil dibuat',
@@ -90,5 +96,22 @@ class InvoiceController extends Controller
         $data = $invoice->toArray();
         $data['total_harga'] = $invoice->total;
         return response()->json($data, 200);
+    }
+
+    public function resendEmail($id)
+    {
+        $invoice = Invoice::with('pengajuan')->find($id);
+        if (!$invoice) {
+            return response()->json(['message' => 'Invoice not found'], 404);
+        }
+        $customerEmail = $invoice->pengajuan->email;
+        if (!$customerEmail) {
+            return response()->json(['message' => 'Customer email not found'], 404);
+        }
+
+        // Kirim email (gunakan Mailable sesuai kebutuhan)
+        Mail::to($customerEmail)->send(new \App\Mail\InvoiceMail($invoice));
+
+        return response()->json(['message' => 'Invoice email resent to customer.']);
     }
 }

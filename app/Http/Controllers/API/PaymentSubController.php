@@ -57,32 +57,46 @@ class PaymentSubController extends Controller
         ]);
 
         try {
+            // Cari paymentsub berdasarkan pengajuan_id
+            $paymentsub = Paymentsub::where('pengajuan_id', $request->pengajuan_id)->first();
+
+            if (!$paymentsub) {
+                return response()->json([
+                    'message' => 'Data pembayaran belum tersedia untuk pengajuan ini.'
+                ], 404);
+            }
+
             if ($request->hasFile('path_file')) {
                 $storage = Storage::disk('public');
                 $imageName = 'paymentsub/' . Str::random(32) . "." . $request->path_file->getClientOriginalExtension();
 
-                // Save file
+                // Hapus file lama jika ada
+                if ($paymentsub->path_file && $storage->exists($paymentsub->path_file)) {
+                    $storage->delete($paymentsub->path_file);
+                }
+
+                // Simpan file baru
                 $storage->put($imageName, file_get_contents($request->path_file));
 
-                $paymentsub = Paymentsub::create([
-                    'pengajuan_id' => $request->pengajuan_id,
+                // Update data paymentsub
+                $paymentsub->update([
                     'amount_paid' => $request->amount_paid,
                     'method' => $request->method,
                     'path_file' => $imageName,
                     'paid_at' => now(),
                 ]);
-
-                return response()->json([
-                    'message' => 'Pembayaran sub berhasil dibuat',
-                    'paymentsub' => [
-                        ...$paymentsub->toArray(),
-                        'path_file' => url('storage/' . $imageName)
-                    ]
-                ], 201);
             }
+
+            return response()->json([
+                'message' => 'Bukti pembayaran berhasil diupdate',
+                'paymentsub' => [
+                    ...$paymentsub->toArray(),
+                    'path_file' => url('storage/' . $paymentsub->path_file)
+                ]
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal menyimpan pembayaran: ' . $e->getMessage()
+                'message' => 'Gagal mengupdate pembayaran: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -217,5 +231,26 @@ class PaymentSubController extends Controller
         ]);
 
         return response()->json(['message' => 'Pembayaran berhasil diverifikasi', 'paymentsub' => $paymentsub], 200);
+    }
+
+    public function notifications()
+    {
+        // Hanya ambil paymentsub yang sudah ada file bukti pembayaran
+        $list = Paymentsub::with('pengajuan')
+            ->whereNotNull('path_file')
+            ->orderBy('updated_at', 'desc')
+            ->take(20)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'pengajuan_id' => $item->pengajuan_id,
+                    'institution' => $item->pengajuan->institution ?? '-',
+                    'applicant' => $item->pengajuan->applicant ?? '-',
+                    'uploaded_at' => $item->updated_at,
+                    'bukti_url' => $item->path_file ? asset('storage/' . $item->path_file) : null,
+                ];
+            });
+        return response()->json($list);
     }
 }

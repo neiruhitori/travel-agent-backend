@@ -18,6 +18,7 @@ return new class extends Migration
             $table->decimal('amount_paid', 15, 2);
             $table->enum('method', ['transfer_bank', 'cash', 'credit_card', 'debit_card', 'e_wallet']);
             $table->string('path_file')->nullable(); // Path untuk bukti pembayaran
+            $table->text('barcode')->nullable();
             $table->string('verified_by')->nullable(); // Status saat diverifikasi
             $table->timestamp('verified_at')->nullable(); // Waktu diverifikasi
             $table->timestamps();

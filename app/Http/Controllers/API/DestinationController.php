@@ -62,6 +62,11 @@ class DestinationController extends Controller
             return response()->json(['message' => 'Destination Not Found.'], 404);
         }
 
+        // Tambahkan image_url
+        $destination->image_url = $destination->image
+            ? asset('storage/images/' . $destination->image)
+            : null;
+
         return response()->json([
             'destination' => $destination
         ], 200);
