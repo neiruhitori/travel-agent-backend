@@ -100,3 +100,4 @@ Route::patch('pengajuan/{id}/status', [PengajuanController::class, 'updateStatus
 Route::apiResource('paymentsub', PaymentSubController::class);
 Route::get('notifications/paymentsub', [PaymentSubController::class, 'notifications']);
 
+Route::get('/paymentsub/status/{pengajuan_id}', [PaymentSubController::class, 'getPaymentStatus']);

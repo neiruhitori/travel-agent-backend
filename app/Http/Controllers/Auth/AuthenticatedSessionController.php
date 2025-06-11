@@ -22,18 +22,18 @@ class AuthenticatedSessionController extends Controller
 
         // Ambil data user yang sedang login termasuk role-nya
         $user = Auth::user();
-        
+
         // Kembalikan data user dalam response JSON
         return response()->json([
             'user' => $user,
-            // Anda juga bisa menambahkan data lain yang diperlukan disini
+            'message' => "Login berhasil!"
         ]);
     }
 
     /**
      * Destroy an authenticated session.
      */
-    public function destroy(Request $request): Response
+    public function destroy(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();
 
@@ -41,6 +41,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerateToken();
 
-        return response()->noContent();
+        return response()->json([
+            'message' => 'Logout berhasil.'
+        ]);
     }
 }

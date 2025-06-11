@@ -22,31 +22,6 @@ class PaymentSubController extends Controller
         return response()->json($paymentsubs, 200);
     }
 
-    // Store a new payment sub
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'pengajuan_id' => 'required|exists:pengajuan,id',
-    //         'amount_paid' => 'required|numeric|min:0',
-    //         'method' => 'required|in:transfer_bank,cash,credit_card,debit_card,e_wallet',
-    //         'path_file' => 'nullable|string',
-    //         'paid_at' => 'nullable|date',
-    //     ]);
-
-    //     $paymentsub = Paymentsub::create([
-    //         'pengajuan_id' => $request->pengajuan_id,
-    //         'amount_paid' => $request->amount_paid,
-    //         'method' => $request->method,
-    //         'path_file' => $request->path_file,
-    //         'paid_at' => $request->paid_at,
-    //     ]);
-
-    //     return response()->json([
-    //         'message' => 'Pembayaran sub berhasil dibuat',
-    //         'paymentsub' => $paymentsub
-    //     ], 201);
-    // }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -61,11 +36,14 @@ class PaymentSubController extends Controller
             $paymentsub = Paymentsub::where('pengajuan_id', $request->pengajuan_id)->first();
 
             if (!$paymentsub) {
-                return response()->json([
-                    'message' => 'Data pembayaran belum tersedia untuk pengajuan ini.'
-                ], 404);
+                $paymentsub = new Paymentsub([
+                    'pengajuan_id' => $request->pengajuan_id,
+                    'amount_paid' => $request->amount_paid,
+                    'method' => $request->method,
+                ]);
             }
 
+            // Upload file
             if ($request->hasFile('path_file')) {
                 $storage = Storage::disk('public');
                 $imageName = 'paymentsub/' . Str::random(32) . "." . $request->path_file->getClientOriginalExtension();
@@ -75,20 +53,22 @@ class PaymentSubController extends Controller
                     $storage->delete($paymentsub->path_file);
                 }
 
-                // Simpan file baru
                 $storage->put($imageName, file_get_contents($request->path_file));
+                $paymentsub->path_file = $imageName;
+            }
 
-                // Update data paymentsub
-                $paymentsub->update([
-                    'amount_paid' => $request->amount_paid,
-                    'method' => $request->method,
-                    'path_file' => $imageName,
-                    'paid_at' => now(),
-                ]);
+            $paymentsub->paid_at = now();
+            $paymentsub->save();
+
+            // Update status pengajuan
+            $pengajuan = Pengajuan::find($request->pengajuan_id);
+            if ($pengajuan) {
+                $pengajuan->status = 'menunggu_verifikasi_pembayaran';
+                $pengajuan->save();
             }
 
             return response()->json([
-                'message' => 'Bukti pembayaran berhasil diupdate',
+                'message' => 'Bukti pembayaran berhasil diupload',
                 'paymentsub' => [
                     ...$paymentsub->toArray(),
                     'path_file' => url('storage/' . $paymentsub->path_file)
@@ -96,7 +76,7 @@ class PaymentSubController extends Controller
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal mengupdate pembayaran: ' . $e->getMessage()
+                'message' => 'Gagal mengupload pembayaran: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -252,5 +232,15 @@ class PaymentSubController extends Controller
                 ];
             });
         return response()->json($list);
+    }
+
+    public function getPaymentStatus($pengajuan_id)
+    {
+        $paymentsub = Paymentsub::where('pengajuan_id', $pengajuan_id)->first();
+
+        return response()->json([
+            'status' => $paymentsub ? 'submitted' : 'pending',
+            'payment_data' => $paymentsub
+        ]);
     }
 }
