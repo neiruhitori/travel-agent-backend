@@ -17,6 +17,7 @@ class Paymentsub extends Model
         'path_file',
         'verified_by',
         'verified_at',
+        'barcode' //INIT
     ];
 
     public function pengajuan()

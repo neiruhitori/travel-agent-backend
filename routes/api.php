@@ -1,13 +1,13 @@
 <?php
 
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\BookingController;
-use App\Http\Controllers\Api\BookingDestController;
+// use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\BookingController;
+use App\Http\Controllers\API\BookingDestController;
 use App\Http\Controllers\API\DestinationController;
 use App\Http\Controllers\API\PackageController;
-use App\Http\Controllers\Api\PaymentController;
+use App\Http\Controllers\API\PaymentController;
 use App\Http\Controllers\API\PengajuanController;
-use App\Http\Controllers\Api\ReviewController;
+use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\TransactionController;
 use App\Http\Controllers\API\VehicleController;
@@ -34,6 +34,7 @@ Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
     Route::apiResource('reviews', ReviewController::class);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('pengajuan', PengajuanController::class);
+    Route::apiResource('paymentsub', PaymentSubController::class);
 });
 
 // Authenticated user routes
@@ -69,6 +70,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Customer transactions endpoints
     Route::get('transactions/{transaction}', [TransactionController::class, 'show']);
+
+    // New booking endpoint
+    Route::get('/bookings/{id}', [BookingController::class, 'show']);
 });
 
 // buat landing page
@@ -80,6 +84,9 @@ Route::apiResource('destinations', DestinationController::class);
 Route::apiResource('pengajuan', PengajuanController::class);
 
 Route::apiResource('invoices', InvoiceController::class);
+// resend Email
+Route::post('invoices/{id}/resend', [InvoiceController::class, 'resendEmail']);
+Route::post('/pengajuan/{id}/resend-payment-received', [PengajuanController::class, 'resendPaymentReceived']);
 
 Route::get('invoice/by-pengajuan/{pengajuan_id}', [InvoiceController::class, 'byPengajuan']);
 
@@ -87,3 +94,12 @@ Route::get('invoice/by-pengajuan/{pengajuan_id}', [InvoiceController::class, 'by
 Route::post('paymentsub/generate-barcode', [PaymentSubController::class, 'generateBarcode']);
 // Route untuk mengambil barcode berdasarkan pengajuan_id
 Route::get('paymentsub/barcode/{pengajuan_id}', [PaymentSubController::class, 'getBarcodeByPengajuan']);
+
+// Route untuk update status pengajuan user
+Route::patch('pengajuan/{id}/status', [PengajuanController::class, 'updateStatus']);
+Route::apiResource('paymentsub', PaymentSubController::class);
+Route::get('notifications/paymentsub', [PaymentSubController::class, 'notifications']);
+
+Route::get('/paymentsub/status/{pengajuan_id}', [PaymentSubController::class, 'getPaymentStatus']);
+
+Route::get('paymentsub/by-pengajuan/{pengajuanId}', [PaymentSubController::class, 'getByPengajuan']);

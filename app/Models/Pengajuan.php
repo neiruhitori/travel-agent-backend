@@ -36,6 +36,11 @@ class Pengajuan extends Model
     //     return $this->belongsTo(Vehicle::class);
     // }
 
+    public function paymentsub()
+    {
+        return $this->hasOne(Paymentsub::class, 'pengajuan_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);
@@ -58,6 +63,8 @@ class Pengajuan extends Model
         'disetujui',
         'dalam_perjalanan',
         'menunggu_pembayaran',
+        'menunggu_verifikasi_pembayaran',
+        'pembayaran_ditolak',
         'lunas',
         'ditolak',
     ];

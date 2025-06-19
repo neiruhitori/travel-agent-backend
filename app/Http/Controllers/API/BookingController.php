@@ -10,15 +10,25 @@ class BookingController extends Controller
 {
     public function index()
     {
-        $bookings = Booking::with(['user', 'package', 'vehicle'])->get();
-        return response()->json($bookings, 200);
+        try {
+            $bookings = Booking::with(['user', 'package', 'vehicle'])->get();
+            return response()->json([
+                'status' => 'success',
+                'data' => $bookings
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'package_id' => 'nullable|exists:packages,id', // Ini membuat package_id optional
+            'package_id' => 'nullable|exists:packages,id',
             'vehicle_id' => 'required|exists:vehicles,id',
             'booking_date' => 'required|date',
             'jumlah_penumpang' => 'required|numeric|min:1',
@@ -32,45 +42,56 @@ class BookingController extends Controller
             'booking_date' => $request->booking_date,
             'jumlah_penumpang' => $request->jumlah_penumpang,
             'total_price' => $request->total_price,
-            'status' => 'pending', // default
+            'status' => 'pending'
         ]);
 
-        return response()->json(['message' => 'Booking berhasil disimpan', 'booking' => $booking], 201);
+        return response()->json([
+            'message' => 'Booking berhasil dibuat',
+            'data' => $booking
+        ], 201);
     }
 
     public function show($id)
     {
-        $booking = Booking::find($id);
-        return $booking ? response()->json($booking, 200) : response()->json(['message' => 'Booking not found'], 404);
+        $booking = Booking::with(['user', 'package', 'vehicle', 'payment.transaction'])
+            ->find($id);
+
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        return response()->json(['data' => $booking], 200);
     }
 
     public function update(Request $request, $id)
     {
         $booking = Booking::find($id);
         if (!$booking) {
-            return response()->json(['message' => 'Booking not found'], 404);
+            return response()->json(['message' => 'Booking tidak ditemukan'], 404);
         }
 
         $request->validate([
-            'user_id' => 'required|exists:users,id',
-            'package_id' => 'nullable|exists:packages,id', // Ini membuat package_id optional
-            'vehicle_id' => 'required|exists:vehicles,id',
-            'booking_date' => 'required|date',
-            'jumlah_penumpang' => 'required|numeric|min:1',
-            'total_price' => 'required|numeric|min:0',
-            'status' => 'required|in:pending,cancelled,confirmed,completed',
+            'status' => 'required|in:pending,confirmed,cancelled,completed'
         ]);
 
-        $booking->update($request->all());
-        return response()->json(['message' => 'Booking updated successfully', 'data' => $booking], 200);
+        $booking->update([
+            'status' => $request->status
+        ]);
+
+        return response()->json([
+            'message' => 'Status booking berhasil diperbarui',
+            'data' => $booking
+        ], 200);
     }
 
     public function destroy($id)
     {
         $booking = Booking::find($id);
-        if (!$booking) return response()->json(['message' => 'Booking not found'], 404);
+        if (!$booking) {
+            return response()->json(['message' => 'Booking tidak ditemukan'], 404);
+        }
 
         $booking->delete();
-        return response()->json(['message' => 'Booking delete'], 200);
+        return response()->json(['message' => 'Booking berhasil dihapus'], 200);
     }
 }

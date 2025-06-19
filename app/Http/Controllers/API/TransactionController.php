@@ -9,7 +9,11 @@ use Illuminate\Http\Request;
 class TransactionController extends Controller
 {
     public function index() {
-        return response()->json(Transaction::all(), 200);
+        // Load relationships with user and payment
+        return response()->json(
+            Transaction::with(['user', 'payment'])->get(),
+            200
+        );
     }
 
     public function store(Request $request) {
